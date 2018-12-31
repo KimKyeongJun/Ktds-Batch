@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IdTopicDao">
+
+	<insert id="insertIdTopic" parameterType="IdTopic">
+		MERGE INTO IDTOPIC T
+            USING (
+               SELECT   #{ip} AS IP
+                      , #{id} AS ID
+                      , #{yyyymmdd} AS YYYYMMDD
+                      , #{url} AS URL
+                      , #{method} AS METHOD
+               FROM   DUAL
+         )
+         ON   (
+               T.IP = #{ip}
+          AND   T.ID = #{id}
+          AND   T.YYYYMMDD = #{yyyymmdd}
+          AND   T.URL = #{url}
+            AND   T.METHOD = #{method}
+         )
+         WHEN MATCHED THEN
+            UPDATE   SET
+            COUNT = COUNT + #{count}
+         WHEN NOT MATCHED THEN
+            INSERT (
+               IP
+               , ID
+               , YYYYMMDD
+               , URL
+               , METHOD
+               , COUNT
+               , IDTOPIC_ID
+            )
+            VALUES   (
+               #{ip}
+               , #{id}
+               , #{yyyymmdd}
+               , #{url}
+               , #{method}
+               , #{count}
+               , NEXTVALUE('BH', IDTOPIC_ID_SEQ.NEXTVAL)
+            )
+	</insert>
+
+</mapper>
